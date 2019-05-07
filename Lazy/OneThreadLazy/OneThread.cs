@@ -12,7 +12,7 @@ namespace OneThreadLazy
             string testString = "hello";
             Func<string> supplier = () => testString;
 
-            var lazy = LazyFactory<string>.CreateOneThreadLazy(supplier);
+            var lazy = Lazy.LazyFactory.CreateSingleThreadedLazy(supplier); 
             var obj1 = lazy.Get();
             var obj2 = lazy.Get();
 
@@ -29,29 +29,11 @@ namespace OneThreadLazy
                 return counter;
             });
 
-            var lazy = LazyFactory<int>.CreateOneThreadLazy(supplier);
+            var lazy = Lazy.LazyFactory.CreateSingleThreadedLazy(supplier);
             var obj1 = lazy.Get();
             var obj2 = lazy.Get();
 
             Assert.AreEqual(1, counter);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void NullSupplierShouldThrowException()
-        {
-            var lazy = LazyFactory<string>.CreateOneThreadLazy(null);
-        }
-
-        [TestMethod]
-        public void SupplierReturningNullShouldWorkCorrectly()
-        {
-            var lazy = LazyFactory<int>.CreateOneThreadLazy(() => null);
-            var obj1 = lazy.Get();
-            var obj2 = lazy.Get();
-
-            Assert.IsNull(obj1);
-            Assert.IsNull(obj2);
         }
     }
 }

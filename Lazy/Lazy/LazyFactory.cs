@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Lazy
 {
-    class LazyFactory
+    public static class LazyFactory
     {
         public static ILazy<T> CreateSingleThreadedLazy<T>(Func<T> supplier)
             => new Lazy<T>(supplier);

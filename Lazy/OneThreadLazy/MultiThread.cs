@@ -7,8 +7,8 @@ namespace OneThreadLazy
     [TestClass]
     public class MultiThread
     {
-            const int _threadsCount = 1000;
-            Thread[] _threads = new Thread[_threadsCount];
+            const int threadsCount = 1000;
+            Thread[] threads = new Thread[threadsCount];
 
             [TestMethod]
             public void MultiThreadGetShouldReturnTheSameObject()
@@ -16,10 +16,10 @@ namespace OneThreadLazy
                 string testString = "hello";
                 Func<string> supplier = () => testString;
 
-                var lazy = LazyFactory<string>.CreateMultiThreadLazy(supplier);
-                for (int i = 0; i < _threadsCount; ++i)
+                var lazy = Lazy.LazyFactory.CreateSingleThreadedLazy(supplier);
+                for (int i = 0; i < threadsCount; ++i)
                 {
-                    _threads[i] = new Thread(() =>
+                    threads[i] = new Thread(() =>
                     {
                         for (int j = 0; j < 10; ++j)
                         {
@@ -28,12 +28,12 @@ namespace OneThreadLazy
                     });
                 }
 
-                foreach (var thread in _threads)
+                foreach (var thread in threads)
                 {
                     thread.Start();
                 }
 
-                foreach (var thread in _threads)
+                foreach (var thread in threads)
                 {
                     thread.Join();
                 }
@@ -49,31 +49,31 @@ namespace OneThreadLazy
                     return counter;
                 });
 
-                var lazy = LazyFactory<int>.CreateOneThreadLazy(supplier);
-                for (int i = 0; i < _threadsCount; ++i)
+                var lazy = Lazy.LazyFactory.CreateSingleThreadedLazy(supplier);
+                for (int i = 0; i < threadsCount; ++i)
                 {
-                    _threads[i] = new Thread(() =>
+                    threads[i] = new Thread(() =>
                     {
                         for (int j = 0; j < 10; ++j)
                         {
-                            Assert.AreEqual(1, lazy.Get());
+                            Assert.AreEqual(2, lazy.Get());
                         }
                     });
                 }
 
-                foreach (var thread in _threads)
+                foreach (var thread in threads)
                 {
                     thread.Start();
                 }
 
                 Thread.Sleep(200);
 
-                foreach (var thread in _threads)
+                foreach (var thread in threads)
                 {
                     thread.Join();
                 }
 
-                Assert.AreEqual(1, counter);
+                Assert.AreEqual(2, counter);
             }
         }
     }
