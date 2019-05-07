@@ -63,6 +63,7 @@ namespace MyThreadPool.UnitTest
             myPool.Shutdown();
         }
 
+        //тест на то, что пул не ломается при возникновении исключений
         [TestMethod]
         public void CheckIfExceptionDontStopEvaluation()
         {
@@ -88,6 +89,7 @@ namespace MyThreadPool.UnitTest
             var nextTask = task.ContinueWith<int>(i => throw new ArgumentException());
             var result = task.Result;
             var nextResult = nextTask.Result;
+            myPool.Shutdown();
         }
 
         [TestMethod]

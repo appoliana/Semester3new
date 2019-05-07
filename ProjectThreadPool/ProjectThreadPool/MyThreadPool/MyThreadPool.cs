@@ -6,63 +6,70 @@ using System.Threading;
 namespace MyThreadPool
 {
     public class MyThreadPool
-    {
-        protected int _poolCapacity;
-        protected int _stopedThreadsCounter;
-        protected object _lockObject;
-        protected CancellationTokenSource _cts;
+    { 
+        // ёмкость пула (общее кол-во)
+        protected int poolCapacity;
+        // счётчик оставновленных нитей
+        protected int stopedThreadsCounter;
+        // объект для блокировки элементов (защита от гонки данных)
+        protected object lockObject;
+        // спец объект для отмены выполнения нитей
+        protected CancellationTokenSource cts;
 
-        protected List<Thread> _threadsList;
-        protected ConcurrentQueue<Action> _jobsQueue;       
+        protected List<Thread> threadsList;
 
-        protected AutoResetEvent _eventTaskAdded;
-        protected AutoResetEvent _eventJobDone;
+        // очередь из методов на обработку в наших нитях
+        protected ConcurrentQueue<Action> jobsQueue;       
+
+        // сигнальные объекты
+        protected AutoResetEvent eventTaskAdded;
+        protected AutoResetEvent eventJobDone;
 
         public bool IsActive
         {
-            get => !_cts.Token.IsCancellationRequested;
+            get => !cts.Token.IsCancellationRequested;
         }
 
         public MyThreadPool(int tasksQuantity)
         {
-            _poolCapacity = tasksQuantity;
-            _stopedThreadsCounter = 0;
-            _lockObject = new object();
-            _cts = new CancellationTokenSource();
-            _jobsQueue = new ConcurrentQueue<Action>();
-            _eventTaskAdded = new AutoResetEvent(false);
-            _eventJobDone = new AutoResetEvent(false);
+            poolCapacity = tasksQuantity;
+            stopedThreadsCounter = 0;
+            lockObject = new object();
+            cts = new CancellationTokenSource();
+            jobsQueue = new ConcurrentQueue<Action>();
+            eventTaskAdded = new AutoResetEvent(false);
+            eventJobDone = new AutoResetEvent(false);
 
             StartPool();
         }
 
         protected void StartPool()
         {
-            _threadsList = new List<Thread>(_poolCapacity);
-            for (var i = 0; i < _poolCapacity; i++)
+            threadsList = new List<Thread>(poolCapacity);
+            for (var i = 0; i < poolCapacity; i++)
             {
                 var thread = new Thread(() =>
                 {
                     while (IsActive)
                     {
-                        if (_jobsQueue.TryDequeue(out Action doJob))
+                        if (jobsQueue.TryDequeue(out Action doJob))
                         {
                             doJob();
                         }
                         else
                         {
-                            _eventTaskAdded.WaitOne();
+                            eventTaskAdded.WaitOne();
                         }
                     }
 
-                    lock (_lockObject)
+                    lock (lockObject)
                     {
-                        _stopedThreadsCounter++;
+                        stopedThreadsCounter++;
                     }
-                    _eventJobDone.Set();
+                    eventJobDone.Set();
                 });
 
-                _threadsList.Add(thread);
+                threadsList.Add(thread);
                 thread.IsBackground = true;
                 thread.Start();
             }
@@ -81,30 +88,30 @@ namespace MyThreadPool
                 throw new MyThreadPoolCanceledException();
             }
 
-            _jobsQueue.Enqueue(task.DoJob);
-            _eventTaskAdded.Set();
+            jobsQueue.Enqueue(task.DoJob);
+            eventTaskAdded.Set();
 
             return task;
         }
 
         public void Shutdown()
         {
-            _cts.Cancel();
-            _eventTaskAdded.Set();
-            while (true)
+            cts.Cancel();
+            eventTaskAdded.Set();
+            while (true) // ждет, пока закончат выполнение все нити
             {
-                _eventJobDone.WaitOne();
-                _eventTaskAdded.Set();
+                eventJobDone.WaitOne();
+                eventTaskAdded.Set();
 
-                lock (_lockObject)
+                lock (lockObject)
                 {
-                    if (_poolCapacity == _stopedThreadsCounter)
+                    if (poolCapacity == stopedThreadsCounter)
                     {
                         break;
                     }
                 }
             }
-            _jobsQueue = null;
+            jobsQueue = null;
         }
     }
 }

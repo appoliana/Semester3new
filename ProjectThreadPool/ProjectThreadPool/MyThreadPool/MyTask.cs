@@ -6,25 +6,29 @@ namespace MyThreadPool
 {
     public class MyTask<TResult> : IMyTask<TResult>
     {
-        protected TResult _result;
-        protected Func<TResult> _job;
-        protected Exception _innerException;
-        protected MyThreadPool _threadPool;
-        protected object _lockObject;
+        protected TResult result;
+        protected Func<TResult> job;
 
-        private AutoResetEvent _getResultsEvent;
-        private ManualResetEvent _taskAddedEvent;
-        private ConcurrentQueue<Action> _queueJobs;
+        protected Exception innerException;
+        protected MyThreadPool threadPool; //ссылка на наш пул
+        protected object lockObject;
+
+        //для обмена сообщениями между потоками
+        private AutoResetEvent getResultsEvent;
+
+        // нужно для ContinueWith
+        private ManualResetEvent taskAddedEvent;
+        private ConcurrentQueue<Action> queueJobs;
         
 
-        public MyTask(MyThreadPool threadPool, Func<TResult> job)
+        public MyTask(MyThreadPool threadPool1, Func<TResult> job1)
         {
-            _job = job;
-            _threadPool = threadPool;
-            _lockObject = new object();
-            _getResultsEvent = new AutoResetEvent(false);
-            _taskAddedEvent = new ManualResetEvent(true);
-            _queueJobs = new ConcurrentQueue<Action>();
+            job = job1;
+            threadPool = threadPool1;
+            lockObject = new object();
+            getResultsEvent = new AutoResetEvent(false);
+            taskAddedEvent = new ManualResetEvent(true);
+            queueJobs = new ConcurrentQueue<Action>();
         }
 
         public bool IsCompleted { get; private set; }
@@ -33,14 +37,14 @@ namespace MyThreadPool
         {
             get
             {
-                _getResultsEvent.WaitOne();
+                getResultsEvent.WaitOne(); //свойство вернет результат только когда получит сигнал о том что есть результат
 
-                if (_innerException == null)
+                if (innerException == null)
                 {
-                    return _result;
+                    return result;
                 }
 
-                throw new AggregateException(_innerException);
+                throw new AggregateException(innerException); //собирает со всех дочерних потоков исклбчения
             }
         }
 
@@ -48,17 +52,17 @@ namespace MyThreadPool
         {
             try
             {
-                _result = _job();
+                result = job();
             }
 
             catch (Exception ex)
             {
-                _innerException = ex;
+                innerException = ex;
             }
 
-            lock (_lockObject)
+            lock (lockObject)
             {
-                _getResultsEvent.Set();
+                getResultsEvent.Set();
                 IsCompleted = true;
                 FinishAndContinueJobs();
             }
@@ -66,43 +70,45 @@ namespace MyThreadPool
 
         public IMyTask<TNewResult> ContinueWith<TNewResult>(Func<TResult, TNewResult> job)
         {
-            var task = new MyTask<TNewResult>(_threadPool, () => job(_result));
-            lock (_lockObject)
+            // оболочка для функции, которая продолжает вычисление на основе полученного результата в том же пуле
+            var task = new MyTask<TNewResult>(threadPool, () => job(result));
+            lock (lockObject)
             {
-                if (!IsCompleted)
+                if (!IsCompleted) //если не закончена работа
                 {
-                    _queueJobs.Enqueue(() => _threadPool.AddTask<TNewResult>(task));
+                    // помещаем новую задачу в наш пул на выполнение
+                    queueJobs.Enqueue(() => threadPool.AddTask<TNewResult>(task));
                     return task;
                 }
             }
-            return _threadPool.AddTask(task);
+            return threadPool.AddTask(task); // если закончена, то сразу в пул
         }
 
         private void FinishAndContinueJobs()
         {
-            if (_queueJobs.Count == 0)
+            if (queueJobs.Count == 0)
             {
                 return;
             }
 
-            if (_innerException == null)
+            if (innerException == null)
             {
-                if (!_threadPool.IsActive)
+                if (!threadPool.IsActive)
                 {
-                    _queueJobs = null;
+                    queueJobs = null;
                     return;
                 }
 
-                foreach (Action job in _queueJobs)
+                foreach (Action job in queueJobs)
                 {
-                    job();
+                    job(); //помещаем в пул на выполнение и задача начинает считаться
                 }
 
-                _queueJobs = null;
+                queueJobs = null;
             }
             else
             {
-                throw new AggregateException(_innerException);
+                throw new AggregateException(innerException); //место для всех исключений
             }
         }
     }
