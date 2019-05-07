@@ -30,14 +30,8 @@ namespace Server
             {
                 while (client.Connected) 
                 {
-                    NetworkStream stream = client.GetStream();
-                    var reader = new StreamReader(stream, System.Text.Encoding.Unicode);
-                    string response = reader.ReadLine(); 
-                    Console.WriteLine(response);
-                    var writer = new StreamWriter(stream, System.Text.Encoding.Unicode);
-                    string request = RunProsessing(response);
-                    writer.WriteLine(request);
-                    writer.Flush();
+                    Task task = new Task(() => clientConnected(client));
+                    task.Start();
                 }
             }
             catch (AggregateException)
@@ -46,11 +40,16 @@ namespace Server
             }
         }
 
-        public static string RunProsessing(string response)
+        public static void clientConnected(TcpClient client)
         {
-            Task<string> task = Task<string>.Run( () => { ProsessingRequest(response); });
-            task.Start();
-            return "1";
+            NetworkStream stream = client.GetStream();
+            var reader = new StreamReader(stream, System.Text.Encoding.Unicode);
+            string response = reader.ReadLine();
+            Console.WriteLine(response);
+            var writer = new StreamWriter(stream, System.Text.Encoding.Unicode);
+            string request = ProsessingRequest(response);
+            writer.WriteLine(request);
+            writer.Flush();
         }
 
         /// <summary>
