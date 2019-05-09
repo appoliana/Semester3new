@@ -10,10 +10,23 @@ namespace Client
 {
     public class Client
     {
-        const int port = 1200;
-        public static void ClientWork(int port)
+        public Client(int port)
         {
-            using (var client = new TcpClient("localhost", port))
+            this.port = port;
+            this.client = new TcpClient("localhost", port);
+        }
+
+        private int port;
+        private TcpClient client;
+
+        public TcpClient GetClient()
+        {
+            return client;
+        }
+
+        public void ClientWork()
+        {
+            using (client)
             {
                 Console.WriteLine("Hellow! If you want to see files send 1 and then parth, if you wand to download files right 2 and then parth, for exit right Exit.");
                 NetworkStream stream = client.GetStream();

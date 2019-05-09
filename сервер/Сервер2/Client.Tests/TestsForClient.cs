@@ -11,7 +11,7 @@ namespace Server.Tests
     {
         public void CreateClient(Task obj)
         {
-            var client = new TcpClient("localhost", 1200);
+            var client = new Client.Client(1200);
         }
 
         [TestMethod]
