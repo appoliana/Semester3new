@@ -12,8 +12,7 @@ namespace Lazy
         private Func<T> supplier;
         private T result;
 
-        public Lazy(Func<T> supplier)
-            => this.supplier = supplier;
+        public Lazy(Func<T> supplier) => this.supplier = supplier;
 
         public T Get()
         {
@@ -24,7 +23,6 @@ namespace Lazy
                 this.supplier = null;
 
             }
-
             return this.result;
         }
     }

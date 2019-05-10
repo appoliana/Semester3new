@@ -30,7 +30,6 @@ namespace Lazy
                     }
                 }
             }
-
             return this.result;
         }
     }
