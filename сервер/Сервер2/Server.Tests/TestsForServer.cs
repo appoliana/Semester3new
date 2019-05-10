@@ -3,6 +3,8 @@ using Сервер2;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
+using System.IO;
 
 namespace Server.Tests
 {
@@ -12,18 +14,11 @@ namespace Server.Tests
         [TestMethod]
         public void CheckMethodListResponse()
         {
-            string path = "D:\\gitNew\\Semester3new\\сервер\\Сервер2\\Server.Tests\\ForTest";
+            int length = Directory.GetCurrentDirectory().Length;
+            string path = Directory.GetCurrentDirectory().Remove(length - 10) + "\\ForTest";
             string testArray = Sevrer.ListResponse(path);
-            Assert.AreEqual(testArray, "3 ============List of files and folders============= " +
+            Assert.AreEqual(testArray, "3 " +
                 ".appveyor.yml <False>, 1.jpg <False>, a.txt <False>, ");
-        }
-
-        [TestMethod]
-        public void CheckMethodGetResponse()
-        {
-            string path = "D:\\gitNew\\Semester3new\\сервер\\Сервер2\\Server.Tests\\ForTest\\a.txt";
-            string testArray = Сервер2.Sevrer.GetResponse(path);
-            Assert.AreEqual(testArray, "The contanse of our file: work");
         }
 
         [TestMethod]

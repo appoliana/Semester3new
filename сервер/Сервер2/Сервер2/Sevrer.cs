@@ -85,7 +85,11 @@ namespace Сервер2
             Console.WriteLine(response);
             int count = 0;
             var dir = new DirectoryInfo(response.Remove(0, 2));
-            string request = "============List of files and folders============= ";
+            if (!dir.Exists)
+            {
+                return "-1";
+            }
+            string request = "";
             foreach (var item in dir.GetDirectories())
             {
                 request += item.Name + " <True>, ";
@@ -105,10 +109,17 @@ namespace Сервер2
         /// </summary>
         public static string GetResponse(string responce)
         {
-            using (var str = new StreamReader(responce.Remove(0, 2)))
+            FileInfo ourfile = new System.IO.FileInfo(responce.Remove(0, 2));
+            if (ourfile.Exists)
             {
-                string request = "The contanse of our file: " + str.ReadToEnd();
-                return request;
+                using (var str = new StreamReader(responce.Remove(0, 2)))
+                {
+                    return ourfile.Length + str.ReadToEnd();
+                }
+            }
+            else
+            {
+                return "-1";
             }
         }
     }
