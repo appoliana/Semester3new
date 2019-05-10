@@ -17,7 +17,7 @@ namespace Server.Tests
         [TestMethod]
         public void IsServerAsked()
         {
-            Sevrer myServer = new Sevrer();
+            Сервер2.Server myServer = new Сервер2.Server();
             Task.Delay(3000).ContinueWith(CreateClient);
             myServer.ServerWork(1200);
             Assert.AreNotEqual(0, myServer.NumOfConnectedClients);

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Сервер2
 {
-    public class Sevrer
+    public class Server
     {
         private const int port = 1200;
 
@@ -25,9 +25,9 @@ namespace Сервер2
 
             try
             {
-                while (client.Connected)
+                if (client.Connected)
                 {
-                    Task task = new Task(() => clientConnected(client));
+                    Task task = new Task(() => ClientConnected(client));
                     task.Start();
                 }
             }
@@ -39,7 +39,7 @@ namespace Сервер2
          //   IsClientConnected = false;
         }
 
-        public void clientConnected(TcpClient client)
+        public void ClientConnected(TcpClient client)
         {
             NetworkStream stream = client.GetStream();
             var reader = new StreamReader(stream, System.Text.Encoding.Unicode);
@@ -109,12 +109,12 @@ namespace Сервер2
         /// </summary>
         public static string GetResponse(string responce)
         {
-            FileInfo ourfile = new System.IO.FileInfo(responce.Remove(0, 2));
-            if (ourfile.Exists)
+            var ourFile = new FileInfo(responce.Remove(0, 2));
+            if (ourFile.Exists)
             {
                 using (var str = new StreamReader(responce.Remove(0, 2)))
                 {
-                    return ourfile.Length + str.ReadToEnd();
+                    return ourFile.Length + str.ReadToEnd();
                 }
             }
             else
