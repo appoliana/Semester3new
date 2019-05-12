@@ -5,7 +5,6 @@ namespace Lazy
     /// <summary>
     /// Класс, который реализует многопоточный Lazy.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     public class MultiThreadedLazy<T> : ILazy<T>
     {
         private readonly object lockObject = new object();

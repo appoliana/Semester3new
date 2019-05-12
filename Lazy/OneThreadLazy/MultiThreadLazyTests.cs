@@ -5,9 +5,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace MultiThreadLazy
 {
     [TestClass]
-    public class MultiThreadLazyTests
+    private class MultiThreadLazyTests
     {
-            private const int threadsCount = 1000;
+            const int threadsCount = 1000;
             Thread[] threads = new Thread[threadsCount];
 
             [TestMethod]

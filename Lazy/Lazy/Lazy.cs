@@ -5,7 +5,6 @@ namespace Lazy
     /// <summary>
     /// Класс, который реализует однопоточный Lazy.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     public class Lazy<T> : ILazy<T>
     {
         private bool isEvaluated = false;
