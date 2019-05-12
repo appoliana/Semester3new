@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MyNUnit
 {
-    class GetAllAssemblies
+    public class GetAllAssemblies
     {
         /// <summary>
         /// Метод, который извлекает из сборки все exe и dll файлы.
@@ -22,11 +22,6 @@ namespace MyNUnit
             {
                 arrayOfFiles = Directory.GetFiles(parth, "*.exe", SearchOption.AllDirectories)
                     .Concat(Directory.GetFiles(parth, "*.dll", SearchOption.AllDirectories)).ToArray();
-                /*for(int i = 0; i < arrayOfFiles.Length; ++i)
-                {
-                    Console.WriteLine(arrayOfFiles[i]);
-                }
-                */
                 try
                 {
                     for (int i = 0; i < arrayOfFiles.Length; ++i)

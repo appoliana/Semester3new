@@ -10,8 +10,6 @@ namespace MyNUnit
         /// <summary>
         /// Метод, который запускает тесты в сборке.
         /// </summary>
-        /// <param name="assembly"></param>
-        /// <returns></returns>
         public string RunTests(Assembly assembly)
         {
             var allTypes = new Type[10000];
@@ -25,6 +23,8 @@ namespace MyNUnit
             }
             foreach (Type type in allTypes)
             {
+                Object run = Activator.CreateInstance(type);
+                RunMethodsWithAnnotationBeforeClass(assembly, type, run);
                 foreach (MethodInfo mInfo in type.GetMethods())
                 {
                     Attribute attribute = FindTestAttribute(mInfo);
@@ -33,16 +33,15 @@ namespace MyNUnit
                         string testName = mInfo.Name;
                         string message = "";
 
-                        RunMethodsWithAnnotationBefore(assembly, type); //что это
+                        RunMethodsWithAnnotationBefore(assembly, type, run); 
 
                         PrintInformationAboutTests print = new PrintInformationAboutTests();
 
                         TestAttribute a = (TestAttribute)attribute;
-                        if (a.MessageAboutIgnoreThisTest != "") // если есть аргумерт Ignore
+                        if (a.MessageAboutIgnoreThisTest != "")
                         {
                             message = "was not done. " + a.MessageAboutIgnoreThisTest;
                             print.PrintInformation(default(TimeSpan), testName, message);
-                            //дальше выполнять код не надо
                         }
                          
                         if (message == "")
@@ -51,8 +50,6 @@ namespace MyNUnit
                             watch.Start();
                             try
                             {
-                                
-                                Object run = Activator.CreateInstance(type);
                                 mInfo.Invoke(run, Array.Empty<Object>());
                                 message = "was successful.";
                                 watch.Stop();
@@ -73,14 +70,17 @@ namespace MyNUnit
                             TimeSpan ts = watch.Elapsed;
                             print.PrintInformation(ts, message, testName);
                         }
-                        RunMethodsWithAnnotationAfter(assembly, type);
+                        RunMethodsWithAnnotationAfter(assembly, type, run);
                     }
-                    RunMethodsWithAnnotationAfterClass(assembly, type);
+                    RunMethodsWithAnnotationAfterClass(assembly, type, run);
                 }
             }
             return "0";
         }
 
+        /// <summary>
+        /// Метод, который ищет TestAttribute  у метода.
+        /// </summary>
         public Attribute FindTestAttribute(MethodInfo mInfo)
         {
             foreach (var attribute in Attribute.GetCustomAttributes(mInfo))
@@ -94,65 +94,64 @@ namespace MyNUnit
             return null;
         }
 
-        public void RunMethodsWithAnnotationBefore(Assembly assembly, Type type)
+        /// <summary>
+        /// Метод, который запускает методы с указанной анотацией.
+        /// </summary>
+        public void RunMethodsWithAnnotationBefore(Assembly assembly, Type type, Object run)
         {
             var allTypes = assembly.GetTypes();
             foreach (MethodInfo mInfo in type.GetMethods())
             {
                 if (Attribute.GetCustomAttributes(mInfo).GetType() == typeof(BeforeAttribute))
                 {
-                    Object run = Activator.CreateInstance(type);
                     mInfo.Invoke(run, Array.Empty<Object>());
                 }
             }
         }
 
-        public void RunMethodsWithAnnotationAfter(Assembly assembly, Type type)
+        /// <summary>
+        /// Метод, который запускает методы с указанной анотацией.
+        /// </summary>
+        public void RunMethodsWithAnnotationAfter(Assembly assembly, Type type, Object run)
         {
             var allTypes = assembly.GetTypes();
             foreach (MethodInfo mInfo in type.GetMethods())
             {
                 if (Attribute.GetCustomAttributes(mInfo).GetType() == typeof(AfterAttribute))
                 {
-                    Object run = Activator.CreateInstance(type);
                     mInfo.Invoke(run, Array.Empty<Object>());
                 }
             }
         }
 
-        public void RunMethodsWithAnnotationBeforeClass(Assembly assembly, Type type)
+        /// <summary>
+        /// Метод, который запускает методы с указанной анотацией.
+        /// </summary>
+        public void RunMethodsWithAnnotationBeforeClass(Assembly assembly, Type type, Object run)
         {
             var allTypes = assembly.GetTypes();
             foreach (MethodInfo mInfo in type.GetMethods())
             {
                 if (Attribute.GetCustomAttributes(mInfo).GetType() == typeof(BeforeClassAttribute))
                 {
-                    Object run = Activator.CreateInstance(type);
                     mInfo.Invoke(run, Array.Empty<Object>());
                 }
             }
         }
 
-        public void RunMethodsWithAnnotationAfterClass(Assembly assembly, Type type)
+        /// <summary>
+        /// Метод, который запускает методы с указанной анотацией.
+        /// </summary>
+        public void RunMethodsWithAnnotationAfterClass(Assembly assembly, Type type, Object run)
         {
             var allTypes = assembly.GetTypes();
             foreach (MethodInfo mInfo in type.GetMethods())
             {
                 if (Attribute.GetCustomAttributes(mInfo).GetType() == typeof(AfterClassAttribute))
                 {
-                    Object run = Activator.CreateInstance(type);
                     mInfo.Invoke(run, Array.Empty<Object>());
                 }
             }
         }
     }
 }
-
-/*
- Обработка метода после его получения:
- 1) Посмотреть есть ли у этого метода TestAttribute
- 2) Если да, то запускаем таймер и смотрим на аргументы
- Если нет аргументов, то просто запускаем
- Если есть и это Ignore, то игнорирует тест и выводит сообщение о причине
- Если вылетело исключение, то смотрим, соответствует ли оно нашему Excepted - если да, то все ок, если нет, то выводим excepted
- * */
