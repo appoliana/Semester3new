@@ -1,0 +1,13 @@
+image: Visual Studio 2017
+build: off
+branches:
+    only:
+    - master
+environment:
+    matrix:
+    - SOLUTION_PATH: Refleksiya
+before_build:
+    - nuget restore %SOLUTION_PATH%\Reflection.sln
+build_script:
+    - msbuild %SOLUTION_PATH%\Reflection.sln
+test: off
