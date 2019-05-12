@@ -5,10 +5,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace MultiThreadLazy
 {
     [TestClass]
-    private class MultiThreadLazyTests
+    public class MultiThreadLazyTests
     {
-            const int threadsCount = 1000;
-            Thread[] threads = new Thread[threadsCount];
+            private const int threadsCount = 1000;
+            private Thread[] threads = new Thread[threadsCount];
 
             [TestMethod]
             public void MultiThreadGetShouldReturnTheSameObject()
