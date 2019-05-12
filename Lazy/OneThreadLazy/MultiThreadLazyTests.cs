@@ -2,12 +2,12 @@
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace OneThreadLazy
+namespace MultiThreadLazy
 {
     [TestClass]
-    public class MultiThread
+    public class MultiThreadLazyTests
     {
-            const int threadsCount = 1000;
+            private const int threadsCount = 1000;
             Thread[] threads = new Thread[threadsCount];
 
             [TestMethod]
@@ -16,7 +16,7 @@ namespace OneThreadLazy
                 string testString = "hello";
                 Func<string> supplier = () => testString;
 
-                var lazy = Lazy.LazyFactory.CreateSingleThreadedLazy(supplier);
+                var lazy = Lazy.LazyFactory.CreateMultiThreadedLazy(supplier);
                 for (int i = 0; i < threadsCount; ++i)
                 {
                     threads[i] = new Thread(() =>
@@ -49,14 +49,14 @@ namespace OneThreadLazy
                     return counter;
                 });
 
-                var lazy = Lazy.LazyFactory.CreateSingleThreadedLazy(supplier);
+                var lazy = Lazy.LazyFactory.CreateMultiThreadedLazy(supplier);
                 for (int i = 0; i < threadsCount; ++i)
                 {
                     threads[i] = new Thread(() =>
                     {
                         for (int j = 0; j < 10; ++j)
                         {
-                            Assert.AreEqual(2, lazy.Get());
+                            Assert.AreEqual(1, lazy.Get());
                         }
                     });
                 }
@@ -73,7 +73,7 @@ namespace OneThreadLazy
                     thread.Join();
                 }
 
-                Assert.AreEqual(2, counter);
+                Assert.AreEqual(1, counter);
             }
         }
     }

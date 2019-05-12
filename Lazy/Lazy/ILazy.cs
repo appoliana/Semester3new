@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Lazy
 {
+    /// <summary>
+    /// Интерфейс, который реализует Lazy.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public interface ILazy<T>
     {
         T Get();

@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace OneThreadLazy
 {
     [TestClass]
-    public class OneThread
+    public class OneThreadLazyTests
     {
         [TestMethod]
         public void GetShouldReturnTheSameObject()

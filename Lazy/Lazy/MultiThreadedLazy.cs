@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Lazy
 {
+    /// <summary>
+    /// Класс, который реализует многопоточный Lazy.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class MultiThreadedLazy<T> : ILazy<T>
     {
         private readonly object lockObject = new object();

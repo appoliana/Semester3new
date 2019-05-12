@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Lazy
 {
+    /// <summary>
+    /// Класс, который создает однопоточный и многопоточный Lazy.
+    /// </summary>
     public static class LazyFactory
     {
         public static ILazy<T> CreateSingleThreadedLazy<T>(Func<T> supplier)

@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Lazy
 {
+    /// <summary>
+    /// Класс, который реализует однопоточный Lazy.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class Lazy<T> : ILazy<T>
     {
         private bool isEvaluated = false;
