@@ -5,11 +5,14 @@ using System.Threading;
 
 namespace MyThreadPool
 {
+    /// <summary>
+    /// Класс MyTrheadPool.
+    /// </summary>
     public class MyThreadPool
     { 
         // ёмкость пула (общее кол-во)
         protected int poolCapacity;
-        // счётчик оставновленных нитей
+        // счётчик остановленных нитей
         protected int stopedThreadsCounter;
         // объект для блокировки элементов (защита от гонки данных)
         protected object lockObject;
@@ -25,11 +28,11 @@ namespace MyThreadPool
         protected AutoResetEvent eventTaskAdded;
         protected AutoResetEvent eventJobDone;
 
-        public bool IsActive
-        {
-            get => !cts.Token.IsCancellationRequested;
-        }
+        public bool IsActive => !cts.Token.IsCancellationRequested;
 
+        /// <summary>
+        /// Конструктор класса MyThreadPool.
+        /// </summary>
         public MyThreadPool(int tasksQuantity)
         {
             poolCapacity = tasksQuantity;
@@ -43,6 +46,9 @@ namespace MyThreadPool
             StartPool();
         }
 
+        /// <summary>
+        /// Метод, который запускает пулл.
+        /// </summary>
         protected void StartPool()
         {
             threadsList = new List<Thread>(poolCapacity);
@@ -75,6 +81,9 @@ namespace MyThreadPool
             }
         }
 
+        /// <summary>
+        /// Метод, который вернет добавленную задачу.
+        /// </summary>
         public IMyTask<TResult> AddJob<TResult>(Func<TResult> job)
         {
             var task = new MyTask<TResult>(this, job);
@@ -94,6 +103,9 @@ namespace MyThreadPool
             return task;
         }
 
+        /// <summary>
+        /// Метод, который завершит работу потоков.
+        /// </summary>
         public void Shutdown()
         {
             cts.Cancel();

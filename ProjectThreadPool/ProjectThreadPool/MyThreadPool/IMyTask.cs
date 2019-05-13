@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MyThreadPool
 {
+    /// <summary>
+    /// Интерфейс, который реализует ThreadPool.
+    /// </summary>
     public interface IMyTask<TResult>
     {
         bool IsCompleted { get; }
