@@ -7,17 +7,24 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Сервер2
+namespace Server
 {
     public class Server
     {
-        private const int port = 1200;
+        private int port;
+        private TcpListener listener;
 
         public int NumOfConnectedClients { get; set; } = 0;
 
+        public Server(int port)
+        {
+            this.port = port;
+
+            listener = new TcpListener(IPAddress.Any, port);
+        }
+
         public void ServerWork(int port) 
         {
-            var listener = new TcpListener(IPAddress.Any, port);
             listener.Start();
             TcpClient client = listener.AcceptTcpClient();
             ++NumOfConnectedClients;
@@ -36,7 +43,6 @@ namespace Сервер2
             {
                 Console.WriteLine("Exception in task.");
             }
-         //   IsClientConnected = false;
         }
 
         public void ClientConnected(TcpClient client)

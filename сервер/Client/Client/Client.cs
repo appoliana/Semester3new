@@ -35,22 +35,24 @@ namespace Client
             using (client)
             {
                 Console.WriteLine("Hello! If you want to see files send 1 and then path, if you want to download files right 2 and then parth, for exit right Exit.");
-                NetworkStream stream = client.GetStream();
+                /*NetworkStream stream = client.GetStream();
                 var reader = new StreamReader(stream, System.Text.Encoding.Unicode);
                 var writer = new StreamWriter(stream, System.Text.Encoding.Unicode);
+                */
                 var message = path;
                 while (message != "Exit")
                 {
-                    writer.WriteLine(message);
+                   /* writer.WriteLine(message);
                     writer.Flush();
                     string data = reader.ReadLine();
+                    */
                     if (message.ElementAt(0) == 1)
                     {
-                        return ListReturn(data);
+                        return ListReturn(message);
                     }
                     if (message.ElementAt(0) == 2)
                     {
-                        return GetReturn(data);
+                        return GetReturn(message);
                     }
                 }
                 return null;
