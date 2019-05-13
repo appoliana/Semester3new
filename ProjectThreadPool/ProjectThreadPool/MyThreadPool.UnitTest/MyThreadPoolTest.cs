@@ -7,30 +7,7 @@ namespace MyThreadPool.UnitTest
     [TestClass]
     public class MyThreadPoolTest
     {
-        [TestMethod]
-        [ExpectedException(typeof(MyThreadPoolCanceledException))]
-        public void CheckIfContinueAfterShutdownExceptionFall()
-        {
-            var poolSize = 10;
-            var myPool = new MyThreadPool(poolSize);
-
-            var task = new MyTask<DateTime>(myPool, () =>
-            {
-                var answer = DateTime.Now;
-                Thread.Sleep(1000);
-                return answer;
-            });
-
-            myPool.AddTask(task);
-            myPool.Shutdown();
-
-            var result = task.Result;
-            Func<DateTime, DateTime> job = (i) => DateTime.Now.AddSeconds(100);
-            var nextTask = task.ContinueWith(job);
-            var nextResult = nextTask.Result;
-        }
-
-        [TestMethod]
+        /*[TestMethod]
         public void CheckIfProperlyDoneJobs()
         {
             var threadsQuantity = 10;
@@ -40,13 +17,13 @@ namespace MyThreadPool.UnitTest
 
             for (var i = 0; i < jobsQuantity; i++)
             {
-                var task = new MyTask<int>(myPool, () => i * i);
-                myPool.AddTask(task);
+                var task = myPool.AddJob(() => i * i);
                 Assert.AreEqual(i * i, task.Result);
             }
 
             myPool.Shutdown();
         }
+        */
 
         [TestMethod]
         public void CheckIfContinueWithWorks()

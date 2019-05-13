@@ -11,22 +11,26 @@ namespace MyThreadPool
     public class MyThreadPool
     { 
         // ёмкость пула (общее кол-во)
-        protected int poolCapacity;
-        // счётчик остановленных нитей
-        protected int stopedThreadsCounter;
-        // объект для блокировки элементов (защита от гонки данных)
-        protected object lockObject;
-        // спец объект для отмены выполнения нитей
-        protected CancellationTokenSource cts;
+        private int poolCapacity;
 
-        protected List<Thread> threadsList;
+        // счётчик остановленных нитей
+        private int stoppedThreadsCounter;
+
+        // объект для блокировки элементов (защита от гонки данных)
+        private object lockObject;
+
+        // спец объект для отмены выполнения нитей
+        private CancellationTokenSource cts;
+
+        private List<Thread> threadsList;
 
         // очередь из методов на обработку в наших нитях
-        protected ConcurrentQueue<Action> jobsQueue;       
+        private ConcurrentQueue<Action> jobsQueue;
 
         // сигнальные объекты
-        protected AutoResetEvent eventTaskAdded;
-        protected AutoResetEvent eventJobDone;
+        private AutoResetEvent eventTaskAdded;
+
+        private AutoResetEvent eventJobDone;
 
         public bool IsActive => !cts.Token.IsCancellationRequested;
 
@@ -36,7 +40,7 @@ namespace MyThreadPool
         public MyThreadPool(int tasksQuantity)
         {
             poolCapacity = tasksQuantity;
-            stopedThreadsCounter = 0;
+            stoppedThreadsCounter = 0;
             lockObject = new object();
             cts = new CancellationTokenSource();
             jobsQueue = new ConcurrentQueue<Action>();
@@ -70,7 +74,7 @@ namespace MyThreadPool
 
                     lock (lockObject)
                     {
-                        stopedThreadsCounter++;
+                        stoppedThreadsCounter++;
                     }
                     eventJobDone.Set();
                 });
@@ -87,20 +91,21 @@ namespace MyThreadPool
         public IMyTask<TResult> AddJob<TResult>(Func<TResult> job)
         {
             var task = new MyTask<TResult>(this, job);
-            return AddTask<TResult>(task);
+            return AddTask(task);
         }
 
-        public IMyTask<TResult> AddTask<TResult>(MyTask<TResult> task)
+        private IMyTask<TResult> AddTask<TResult>(MyTask<TResult> task)
         {
-            if (!IsActive)
+            lock (lockObject)
             {
-                throw new MyThreadPoolCanceledException();
+                if (!IsActive)
+                {
+                    throw new MyThreadPoolCanceledException();
+                }
+                jobsQueue.Enqueue(task.DoJob);
+                eventTaskAdded.Set();
+                return task;
             }
-
-            jobsQueue.Enqueue(task.DoJob);
-            eventTaskAdded.Set();
-
-            return task;
         }
 
         /// <summary>
@@ -108,22 +113,22 @@ namespace MyThreadPool
         /// </summary>
         public void Shutdown()
         {
-            cts.Cancel();
-            eventTaskAdded.Set();
-            while (true) // ждет, пока закончат выполнение все нити
-            {
-                eventJobDone.WaitOne();
+           
+                cts.Cancel();
                 eventTaskAdded.Set();
-
+                while (true) // ждет, пока закончат выполнение все нити
+                {
+                    eventJobDone.WaitOne();
+                    eventTaskAdded.Set();
                 lock (lockObject)
                 {
-                    if (poolCapacity == stopedThreadsCounter)
+                    if (poolCapacity == stoppedThreadsCounter)
                     {
                         break;
                     }
-                }
+                } 
+                jobsQueue = null;
             }
-            jobsQueue = null;
         }
     }
 }

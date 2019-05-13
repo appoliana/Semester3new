@@ -13,7 +13,7 @@ namespace MyThreadPool
         private Func<TResult> job;
 
         private Exception innerException;
-        private MyThreadPool ThreadPool; //ссылка на наш пул
+        private MyThreadPool threadPool; 
         private object lockObject;
 
         //для обмена сообщениями между потоками
@@ -25,10 +25,10 @@ namespace MyThreadPool
         /// <summary>
         /// Конструктор класса MyTask.
         /// </summary>
-        public MyTask(MyThreadPool threadPool, Func<TResult> task)
+        public MyTask(MyThreadPool threadPool, Func<TResult> job)
         {
-            job = task;
-            ThreadPool = threadPool;
+            this.job = job;
+            this.threadPool = threadPool;
             lockObject = new object();
             getResultsEvent = new AutoResetEvent(false);
             queueJobs = new ConcurrentQueue<Action>();
@@ -50,7 +50,7 @@ namespace MyThreadPool
                     return result;
                 }
 
-                throw new AggregateException(innerException); //собирает со всех дочерних потоков исклбчения
+                throw new AggregateException(innerException); 
             }
         }
 
@@ -63,7 +63,6 @@ namespace MyThreadPool
             {
                 result = job();
             }
-
             catch (Exception ex)
             {
                 innerException = ex;
@@ -83,21 +82,21 @@ namespace MyThreadPool
         public IMyTask<TNewResult> ContinueWith<TNewResult>(Func<TResult, TNewResult> job)
         {
             // оболочка для функции, которая продолжает вычисление на основе полученного результата в том же пуле
-            var task = new MyTask<TNewResult>(ThreadPool, () => job(result));
+            var task = new MyTask<TNewResult>(threadPool, () => job(result));
             lock (lockObject)
             {
                 if (!IsCompleted) //если не закончена работа
                 {
                     // помещаем новую задачу в наш пул на выполнение
-                    queueJobs.Enqueue(() => ThreadPool.AddTask<TNewResult>(task));
+                    queueJobs.Enqueue(() => threadPool.AddJob<TNewResult>(() => job(result)));
                     return task;
                 }
             }
-            return ThreadPool.AddTask(task); // если закончена, то сразу в пул
+            return threadPool.AddJob(() => job(result)); // если закончена, то сразу в пул
         }
 
         /// <summary>
-        /// Метод, который помещает задачу в пулл и выполнение.
+        /// Метод, который помещает задачу в пулл и продолжает выполнение .
         /// </summary>
         private void FinishAndContinueJobs()
         {
@@ -108,7 +107,7 @@ namespace MyThreadPool
 
             if (innerException == null)
             {
-                if (!ThreadPool.IsActive)
+                if (!threadPool.IsActive)
                 {
                     queueJobs = null;
                     return;
