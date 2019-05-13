@@ -31,7 +31,7 @@ namespace MyNUnitTests
             myNUnit = new RunTestsInAssembly();
 
             path = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            path = path.Substring(0, path.IndexOf("TestsForMyNUnit")) + "ForTests";
+            path = path.Substring(0, path.IndexOf("MyNUnitTests\\bin\\Debug\\MyNUnitTests.dll")) + "ForTests";
         }
 
         [TestMethod]
@@ -39,20 +39,22 @@ namespace MyNUnitTests
         {
             var getter = new GetAllAssemblies();
             var (listOfAssemblies, message) = getter.GetAll(path);
-            Assert.AreEqual(10, listOfAssemblies.Count);
+            Assert.AreEqual(80, listOfAssemblies.Count);
         }
 
+        //почему-то не находится надо исправить
         [TestMethod]
         public void CheckRunTestOnWithAttrParams()
         {
             path = path + "\\Refleksiya\\ComparatorTests\\bin\\Debug";
             var getter = new GetAllAssemblies();
+            Attribute attribute = null;
             var (listOfAssemblies, message) = getter.GetAll(path);
             foreach (var i in listOfAssemblies)
             {
                 var allTypes = new Type[10000];
                 allTypes = i.GetTypes();
-                Attribute attribute = null;
+                
 
                 foreach (Type type in allTypes)
                 {
@@ -63,9 +65,8 @@ namespace MyNUnitTests
                             attribute = myNUnit.FindTestAttribute(mInfo);
                         }
                     }
-                }
-                Assert.AreEqual(attribute, typeof(TestAttribute).FullName);
-            }
+                }    
+            } Assert.AreEqual(typeof(TestAttribute).FullName, attribute);
         }
     }
 }

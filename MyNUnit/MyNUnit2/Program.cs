@@ -15,7 +15,7 @@ namespace MyNUnit
             string parth = Console.ReadLine();
             string messageAboutWorkingAssemblies = "";
             var listOfAssemblies = new List<Assembly>();
-            GetAllAssemblies getter = new GetAllAssemblies();
+            var getter = new GetAllAssemblies();
             (listOfAssemblies, messageAboutWorkingAssemblies) = getter.GetAll(parth);
             if (messageAboutWorkingAssemblies == "Все в порядке, ошибок нет!")
             {
@@ -36,7 +36,7 @@ namespace MyNUnit
         /// </summary>
         public static void RunAssemblies(Assembly assembly)
         {
-            RunTestsInAssembly run = new RunTestsInAssembly();
+            var run = new RunTestsInAssembly();
             run.RunTests(assembly);
         }
     }

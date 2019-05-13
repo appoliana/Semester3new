@@ -12,7 +12,7 @@ namespace MyNUnit
         /// </summary>
         public string RunTests(Assembly assembly)
         {
-            var allTypes = new Type[10000];
+            Type[] allTypes;
             try
             {
                 allTypes = assembly.GetTypes();
@@ -21,7 +21,7 @@ namespace MyNUnit
             {
                 return "For assembly " + assembly + "was finding error " + ex.Message;
             }
-            foreach (Type type in allTypes)
+            foreach (Type type in allTypes) //где-то здесь параллельность
             {
                 Object run = Activator.CreateInstance(type);
                 RunMethodsWithAnnotationBeforeClass(assembly, type, run);
@@ -35,7 +35,7 @@ namespace MyNUnit
 
                         RunMethodsWithAnnotationBefore(assembly, type, run); 
 
-                        PrintInformationAboutTests print = new PrintInformationAboutTests();
+                        var print = new PrintInformationAboutTests();
 
                         TestAttribute a = (TestAttribute)attribute;
                         if (a.MessageAboutIgnoreThisTest != "")
