@@ -7,7 +7,8 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Server
+//сделать так чтобы хоть что-то работало типо запустить сервер и клиент и что-то происходит  (исполнился какой-то запрос)
+namespace Сервер2
 {
     public class Server
     {
@@ -27,6 +28,8 @@ namespace Server
         {
             listener.Start();
             TcpClient client = listener.AcceptTcpClient();
+            //сделать цикл бесконечный пока не stopped
+            //отдавать здесь работу в отдельный поток модно с таск
             ++NumOfConnectedClients;
             Console.WriteLine("New connection...");
 

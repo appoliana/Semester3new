@@ -27,37 +27,38 @@ namespace Client
 
         public TcpClient GetClient() => client;
 
-        /// <summary>
-        /// Метод, который отвечает за связь с сервером.
-        /// </summary>
-        public List<string> ClientWork(string path)
-        {
-            using (client)
-            {
-                Console.WriteLine("Hello! If you want to see files send 1 and then path, if you want to download files right 2 and then parth, for exit right Exit.");
-                /*NetworkStream stream = client.GetStream();
-                var reader = new StreamReader(stream, System.Text.Encoding.Unicode);
-                var writer = new StreamWriter(stream, System.Text.Encoding.Unicode);
-                */
-                var message = path;
-                while (message != "Exit")
-                {
-                   /* writer.WriteLine(message);
-                    writer.Flush();
-                    string data = reader.ReadLine();
-                    */
-                    if (message.ElementAt(0) == 1)
-                    {
-                        return ListReturn(message);
-                    }
-                    if (message.ElementAt(0) == 2)
-                    {
-                        return GetReturn(message);
-                    }
-                }
-                return null;
-            }
-        }
+//        /// <summary>
+//        /// Метод, который отвечает за связь с сервером.
+//        /// </summary>
+//        /*public List<string> ClientWork(string path)
+//        {
+//            using (client)
+//            {
+//                Console.WriteLine("Hello! If you want to see files send 1 and then path, if you want to download files right 2 and then parth, for exit right Exit.");
+//                /*NetworkStream stream = client.GetStream();
+//                var reader = new StreamReader(stream, System.Text.Encoding.Unicode);
+//                var writer = new StreamWriter(stream, System.Text.Encoding.Unicode);
+//                */
+//                var message = path;
+//                while (message != "Exit")
+//                {
+//                   /* writer.WriteLine(message);
+//                    writer.Flush();
+//                    string data = reader.ReadLine();
+//                    */
+//                    if (message.ElementAt(0) == 1)
+//                    {
+//                        return ListReturn(message);
+//                    }
+//                    if (message.ElementAt(0) == 2)
+//                    {
+//                        return GetReturn(message);
+//                    }
+//                }
+//                return null;
+//            }
+//        }
+//*/
         
         /// <summary>
         /// Метод, который возвращает ответ формата запроса List.
@@ -67,6 +68,7 @@ namespace Client
             NetworkStream stream = client.GetStream();
             var reader = new StreamReader(stream, System.Text.Encoding.Unicode);
             var writer = new StreamWriter(stream, System.Text.Encoding.Unicode);
+            writer.WriteLine("1 " + path);
             writer.Flush();
             string data = reader.ReadLine();
             List<string> anser = new List<string>();
@@ -82,6 +84,7 @@ namespace Client
             NetworkStream stream = client.GetStream();
             var reader = new StreamReader(stream, System.Text.Encoding.Unicode);
             var writer = new StreamWriter(stream, System.Text.Encoding.Unicode);
+            writer.WriteLine("2 " + path);
             writer.Flush();
             string data = reader.ReadLine();
             List<string> anser = new List<string>();

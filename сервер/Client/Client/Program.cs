@@ -18,23 +18,21 @@ namespace Client
                 var input = Console.ReadKey();
                 if (Equals('1', input))
                 {
-                    var list = client.List("ServerExample").Result;
+                    var list = client.ListReturn("ServerExample");
                     if (list != null)
                     {
                         Console.WriteLine(list.Count);
                         Console.WriteLine();
                         for (var i = 0; i < list.Count; i++)
                         {
-                            Console.WriteLine(list[i].Item1);
-                            Console.WriteLine(list[i].Item2);
+                            Console.WriteLine(list[i]);
+                            Console.WriteLine(list[i]);
                         }
                     }
                 }
                 else
                 {
-                    client.Get("ServerExample/Геометрическая прогрессия.docx",
-                        "C:/HW-2nd3rd-sem/Quiz.docx").Wait();
-                    File.Delete("C:/HW-2nd3rd-sem/Quiz.docx");
+                   
                 }
 
                 Console.WriteLine();

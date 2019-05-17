@@ -18,7 +18,7 @@ namespace Server.Tests
         {
             int length = Directory.GetCurrentDirectory().Length;
             string path = Directory.GetCurrentDirectory().Remove(length - 10) + "\\ForTest";
-            string testArray = Server.Server.ListResponse(path);
+            string testArray = Сервер2.Server.ListResponse(path);
             Assert.AreEqual(testArray, "3 " +
                 ".appveyor.yml <False>, 1.jpg <False>, a.txt <False>, ");
         }
@@ -39,13 +39,13 @@ namespace Server.Tests
         public void CheckMethodProsessingRequest()
         {
             string path = "";
-            string testArray = Server.Server.ProsessingRequest(path);
+            string testArray = Сервер2.Server.ProsessingRequest(path);
             Assert.AreEqual(testArray, "Request is empty");
         }
 
         public void CreateServer()
         {
-            var server = new Server.Server();
+            var server = new Сервер2.Server();
         }
 
         public Client.Client CreateClient(Task obj)

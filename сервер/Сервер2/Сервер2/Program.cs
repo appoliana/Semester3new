@@ -6,12 +6,15 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Server
+namespace Сервер2
 {
     class Program
     {
         static void Main(string[] args)
         {
+            int port = 1200;
+            var server = new Server(port);
+            server.ServerWork(port);
         }
     }
 }
