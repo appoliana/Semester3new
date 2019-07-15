@@ -42,13 +42,12 @@ namespace MyNUnitTests
             Assert.AreEqual(80, listOfAssemblies.Count);
         }
 
-        //почему-то не находится надо исправить
         [TestMethod]
         public void CheckRunTestOnWithAttrParams()
         {
             path = path + "\\Refleksiya\\ComparatorTests\\bin\\Debug";
             var getter = new GetAllAssemblies();
-            Attribute attribute = null;
+            bool isAttribute = false;
             var (listOfAssemblies, message) = getter.GetAll(path);
             foreach (var i in listOfAssemblies)
             {
@@ -62,11 +61,11 @@ namespace MyNUnitTests
                     {
                         if (myNUnit.FindTestAttribute(mInfo) != null)
                         {
-                            attribute = myNUnit.FindTestAttribute(mInfo);
+                            isAttribute = true;
                         }
                     }
                 }    
-            } Assert.AreEqual(typeof(TestAttribute).FullName, attribute);
+            } Assert.AreEqual(true, isAttribute);
         }
     }
 }

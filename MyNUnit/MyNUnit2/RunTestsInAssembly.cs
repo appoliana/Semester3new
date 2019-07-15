@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Reflection;
+using System.Threading.Tasks;
 using TestDll;
 
 namespace MyNUnit
@@ -21,60 +22,60 @@ namespace MyNUnit
             {
                 return "For assembly " + assembly + "was finding error " + ex.Message;
             }
-            foreach (Type type in allTypes) //где-то здесь параллельность
-            {
-                Object run = Activator.CreateInstance(type);
-                RunMethodsWithAnnotationBeforeClass(assembly, type, run);
-                foreach (MethodInfo mInfo in type.GetMethods())
-                {
-                    Attribute attribute = FindTestAttribute(mInfo);
-                    if (attribute != null)
-                    {
-                        string testName = mInfo.Name;
-                        string message = "";
+            Parallel.ForEach(allTypes, (currentType) =>
+                                        {
+                                            Object run = Activator.CreateInstance(currentType);
+                                            RunMethodsWithAnnotationBeforeClass(assembly, currentType, run);
+                                            foreach (MethodInfo mInfo in currentType.GetMethods())
+                                            {
+                                                Attribute attribute = FindTestAttribute(mInfo);
+                                                if (attribute != null)
+                                                {
+                                                    string testName = mInfo.Name;
+                                                    string message = "";
 
-                        RunMethodsWithAnnotationBefore(assembly, type, run); 
+                                                    RunMethodsWithAnnotationBefore(assembly, currentType, run);
 
-                        var print = new PrintInformationAboutTests();
+                                                    var print = new PrintInformationAboutTests();
 
-                        TestAttribute a = (TestAttribute)attribute;
-                        if (a.MessageAboutIgnoreThisTest != "")
-                        {
-                            message = "was not done. " + a.MessageAboutIgnoreThisTest;
-                            print.PrintInformation(default(TimeSpan), testName, message);
-                        }
-                         
-                        if (message == "")
-                        { 
-                            var watch = new Stopwatch();
-                            watch.Start();
-                            try
-                            {
-                                mInfo.Invoke(run, Array.Empty<Object>());
-                                message = "was successful.";
-                                watch.Stop();
-                            }
-                            catch (Exception e)
-                            {
-                                watch.Stop();
-                                var exceptionType = e.InnerException;
-                                if (exceptionType !=  a.Excepted)
-                                {
-                                    message = $"thrown the {exceptionType.ToString()}. Exception message is: {e.Message}";
-                                }
-                                else
-                                {
-                                    message = "was successful";
-                                }
-                            }
-                            TimeSpan ts = watch.Elapsed;
-                            print.PrintInformation(ts, message, testName);
-                        }
-                        RunMethodsWithAnnotationAfter(assembly, type, run);
-                    }
-                    RunMethodsWithAnnotationAfterClass(assembly, type, run);
-                }
-            }
+                                                    TestAttribute a = (TestAttribute)attribute;
+                                                    if (a.MessageAboutIgnoreThisTest != "")
+                                                    {
+                                                        message = "was not done. " + a.MessageAboutIgnoreThisTest;
+                                                        print.PrintInformation(default(TimeSpan), testName, message);
+                                                    }
+
+                                                    if (message == "")
+                                                    {
+                                                        var watch = new Stopwatch();
+                                                        watch.Start();
+                                                        try
+                                                        {
+                                                            mInfo.Invoke(run, Array.Empty<Object>());
+                                                            message = "was successful.";
+                                                            watch.Stop();
+                                                        }
+                                                        catch (Exception e)
+                                                        {
+                                                            watch.Stop();
+                                                            var exceptionType = e.InnerException;
+                                                            if (exceptionType != a.Excepted)
+                                                            {
+                                                                message = $"thrown the {exceptionType.ToString()}. Exception message is: {e.Message}";
+                                                            }
+                                                            else
+                                                            {
+                                                                message = "was successful";
+                                                            }
+                                                        }
+                                                        TimeSpan ts = watch.Elapsed;
+                                                        print.PrintInformation(ts, message, testName);
+                                                    }
+                                                    RunMethodsWithAnnotationAfter(assembly, currentType, run);
+                                                }
+                                                RunMethodsWithAnnotationAfterClass(assembly, currentType, run);
+                                            }
+                                        });
             return "0";
         }
 
