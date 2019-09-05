@@ -32,7 +32,8 @@ namespace Client
                 }
                 else
                 {
-                   
+                    var list = client.GetReturn();
+
                 }
 
                 Console.WriteLine();
