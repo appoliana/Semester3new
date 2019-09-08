@@ -106,7 +106,7 @@ namespace MyNUnit
         /// <summary>
         /// Метод, который запускает методы с указанной анотацией.
         /// </summary>
-        public void RunMethodsWithAnnotationBefore(Assembly assembly, Type type, Object run)
+        public static void RunMethodsWithAnnotationBefore(Assembly assembly, Type type, Object run)
         {
             var allTypes = assembly.GetTypes();
             foreach (MethodInfo mInfo in type.GetMethods())
@@ -121,7 +121,7 @@ namespace MyNUnit
         /// <summary>
         /// Метод, который запускает методы с указанной анотацией.
         /// </summary>
-        public void RunMethodsWithAnnotationAfter(Assembly assembly, Type type, Object run)
+        public static void RunMethodsWithAnnotationAfter(Assembly assembly, Type type, Object run)
         {
             var allTypes = assembly.GetTypes();
             foreach (MethodInfo mInfo in type.GetMethods())
@@ -136,7 +136,7 @@ namespace MyNUnit
         /// <summary>
         /// Метод, который запускает методы с указанной анотацией.
         /// </summary>
-        public void RunMethodsWithAnnotationBeforeClass(Assembly assembly, Type type, Object run)
+        public static void RunMethodsWithAnnotationBeforeClass(Assembly assembly, Type type, Object run)
         {
             var allTypes = assembly.GetTypes();
             foreach (MethodInfo mInfo in type.GetMethods())
@@ -151,7 +151,7 @@ namespace MyNUnit
         /// <summary>
         /// Метод, который запускает методы с указанной анотацией.
         /// </summary>
-        public void RunMethodsWithAnnotationAfterClass(Assembly assembly, Type type, Object run)
+        public static void RunMethodsWithAnnotationAfterClass(Assembly assembly, Type type, Object run)
         {
             var allTypes = assembly.GetTypes();
             foreach (MethodInfo mInfo in type.GetMethods())
