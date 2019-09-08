@@ -15,7 +15,7 @@ namespace TestDll
             this.Exception = Excepted;
         }
 
-        public Exception Excepted { get; set; }
+        public Exception Expected { get; set; }
         public string MessageAboutIgnoreThisTest { get; set; }
     }
 

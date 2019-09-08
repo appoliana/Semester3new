@@ -65,7 +65,8 @@ namespace MyNUnitTests
                         }
                     }
                 }    
-            } Assert.AreEqual(true, isAttribute);
+            }
+            Assert.AreEqual(true, isAttribute);
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Reflection;
 namespace CompClass
 {
     /// <summary>
-    /// Класс, который решает поставленную задачу.
+    /// Класс, который сравнивает классы.
     /// </summary>
     public class ClassComparator
     {
@@ -23,12 +23,10 @@ namespace CompClass
         /// <summary>
         /// Метод, который берет классы на сравнение.
         /// </summary>
-        /// <param name="firstClass"></param>
-        /// <param name="secondClass"></param>
         public void GetClasses(Type firstClass, Type secondClass)
         {
-            firstCl = firstClass;
-            secondCl = secondClass;
+            this.firstClass = firstClass;
+            this.secondClass = secondClass;
         }
 
         /// <summary>
@@ -36,13 +34,13 @@ namespace CompClass
         /// </summary>
         public void GetMethods()
         {
-            foreach (var method in firstCl.GetMethods())
+            foreach (var method in firstClass.GetMethods())
             {
                 if (method is MethodInfo)
                     firstMethods.Add(method.ToString());
             }
 
-            foreach (var method in secondCl.GetMethods())
+            foreach (var method in secondClass.GetMethods())
             {
                 if (method is MethodInfo)
                     secondMethods.Add(method.ToString());
@@ -54,16 +52,20 @@ namespace CompClass
         /// </summary>
         public void GetFields()
         {
-            foreach (var field in firstCl.GetFields())
+            foreach (var field in firstClass.GetFields())
             {
                 if (field is FieldInfo)
+                {
                     firstFields.Add(field.ToString());
+                }
             }
 
-            foreach (var field in secondCl.GetFields())
+            foreach (var field in secondClass.GetFields())
             {
                 if (field is FieldInfo)
+                {
                     secondFields.Add(field.ToString());
+                }
             }
         }
 
@@ -91,7 +93,6 @@ namespace CompClass
                 {
                     resultListWithMethods1.Add(m);
                 }
-                //Console.WriteLine(m);
             }
 
             foreach (var m in secondMethods)
@@ -129,12 +130,12 @@ namespace CompClass
             return resultListWithFields1;
         }
 
-        public Type firstCl;
-        public List<string> firstMethods;
-        public List<string> firstFields;
+        private Type firstClass;
+        private List<string> firstMethods;
+        private List<string> firstFields;
 
-        public Type secondCl;
-        public List<string> secondMethods;
-        public List<string> secondFields;
+        private Type secondClass;
+        private List<string> secondMethods;
+        private List<string> secondFields;
     }
 }
