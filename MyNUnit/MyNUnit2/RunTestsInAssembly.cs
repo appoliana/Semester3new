@@ -108,7 +108,6 @@ namespace MyNUnit
         /// </summary>
         public static void RunMethodsWithAnnotationBefore(Assembly assembly, Type type, Object run)
         {
-            var allTypes = assembly.GetTypes();
             foreach (MethodInfo mInfo in type.GetMethods())
             {
                 if (Attribute.GetCustomAttributes(mInfo).GetType() == typeof(BeforeAttribute))
@@ -123,7 +122,6 @@ namespace MyNUnit
         /// </summary>
         public static void RunMethodsWithAnnotationAfter(Assembly assembly, Type type, Object run)
         {
-            var allTypes = assembly.GetTypes();
             foreach (MethodInfo mInfo in type.GetMethods())
             {
                 if (Attribute.GetCustomAttributes(mInfo).GetType() == typeof(AfterAttribute))
