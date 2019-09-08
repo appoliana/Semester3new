@@ -48,7 +48,7 @@ namespace MyNUnit
                         {
                             watch.Stop();
                             var exceptionType = e.InnerException;
-                            if (exceptionType != a.Excepted)
+                            if (exceptionType != a.Expected)
                             {
                                 message = $"thrown the {exceptionType.ToString()}. Exception message is: {e.Message}";
                             }
