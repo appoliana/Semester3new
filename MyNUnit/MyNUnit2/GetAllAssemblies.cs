@@ -8,20 +8,23 @@ using System.Threading.Tasks;
 
 namespace MyNUnit
 {
+    /// <summary>
+    /// Класс, который извлекает exe и dll файлы.
+    /// </summary>
     public class GetAllAssemblies
     {
         /// <summary>
-        /// Метод, который извлекает из сборки все exe и dll файлы.
+        /// Метод, который извлекает exe и dll файлы.
         /// </summary>
-        /// <param name="parth"></param>
-        public (List<Assembly>, string) GetAll(string parth)
+        /// <param name="path"></param>
+        public (List<Assembly>, string) GetAll(string path)
         {
             var arrayOfFiles = new string[100];
             var listOfAssemblies = new List<Assembly>();
-            if (Directory.Exists(parth))
+            if (Directory.Exists(path))
             {
-                arrayOfFiles = Directory.GetFiles(parth, "*.exe", SearchOption.AllDirectories)
-                    .Concat(Directory.GetFiles(parth, "*.dll", SearchOption.AllDirectories)).ToArray();
+                arrayOfFiles = Directory.GetFiles(path, "*.exe", SearchOption.AllDirectories)
+                    .Concat(Directory.GetFiles(path, "*.dll", SearchOption.AllDirectories)).ToArray();
                 try
                 {
                     for (int i = 0; i < arrayOfFiles.Length; ++i)

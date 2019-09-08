@@ -11,7 +11,7 @@ namespace MyNUnit
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Right a parth to assembly...");
+            Console.WriteLine("Write a parth to assembly...");
             string parth = Console.ReadLine();
             string messageAboutWorkingAssemblies = "";
             var listOfAssemblies = new List<Assembly>();
