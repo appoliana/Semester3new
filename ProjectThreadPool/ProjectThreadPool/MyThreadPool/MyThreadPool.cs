@@ -20,7 +20,7 @@ namespace MyThreadPool
         private object lockObject;
 
         // спец объект для отмены выполнения нитей
-        private CancellationTokenSource cts;
+        private CancellationTokenSource cancellationToken;
 
         private List<Thread> threadsList;
 
@@ -32,7 +32,7 @@ namespace MyThreadPool
 
         private AutoResetEvent eventJobDone;
 
-        public bool IsActive => !cts.Token.IsCancellationRequested;
+        public bool IsActive => !cancellationToken.Token.IsCancellationRequested;
 
         /// <summary>
         /// Конструктор класса MyThreadPool.
@@ -42,7 +42,7 @@ namespace MyThreadPool
             poolCapacity = tasksQuantity;
             stoppedThreadsCounter = 0;
             lockObject = new object();
-            cts = new CancellationTokenSource();
+            cancellationToken = new CancellationTokenSource();
             jobsQueue = new ConcurrentQueue<Action>();
             eventTaskAdded = new AutoResetEvent(false);
             eventJobDone = new AutoResetEvent(false);
@@ -113,13 +113,12 @@ namespace MyThreadPool
         /// </summary>
         public void Shutdown()
         {
-           
-                cts.Cancel();
+            cancellationToken.Cancel();
+            eventTaskAdded.Set();
+            while (true) // ждет, пока закончат выполнение все нити
+            {
+                eventJobDone.WaitOne();
                 eventTaskAdded.Set();
-                while (true) // ждет, пока закончат выполнение все нити
-                {
-                    eventJobDone.WaitOne();
-                    eventTaskAdded.Set();
                 lock (lockObject)
                 {
                     if (poolCapacity == stoppedThreadsCounter)

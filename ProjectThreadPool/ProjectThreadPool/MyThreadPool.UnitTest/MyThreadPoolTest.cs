@@ -7,24 +7,6 @@ namespace MyThreadPool.UnitTest
     [TestClass]
     public class MyThreadPoolTest
     {
-        /*[TestMethod]
-        public void CheckIfProperlyDoneJobs()
-        {
-            var threadsQuantity = 10;
-            var myPool = new MyThreadPool(threadsQuantity);
-
-            var jobsQuantity = 30;
-
-            for (var i = 0; i < jobsQuantity; i++)
-            {
-                var task = myPool.AddJob(() => i * i);
-                Assert.AreEqual(i * i, task.Result);
-            }
-
-            myPool.Shutdown();
-        }
-        */
-
         [TestMethod]
         public void CheckIfContinueWithWorks()
         {
@@ -40,7 +22,6 @@ namespace MyThreadPool.UnitTest
             myPool.Shutdown();
         }
 
-        //тест на то, что пул не ломается при возникновении исключений
         [TestMethod]
         public void CheckIfExceptionDontStopEvaluation()
         {
