@@ -3,7 +3,6 @@ using System.IO;
 using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MyNUnit;
-using TestDll;
 
 namespace MyNUnitTests
 {
@@ -27,7 +26,7 @@ namespace MyNUnitTests
         {
             myNUnit = new RunTestsInAssembly();
 
-            path = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            path = Assembly.GetExecutingAssembly().Location;
             path = path.Substring(0, path.IndexOf("MyNUnitTests\\bin\\Debug\\MyNUnitTests.dll")) + "ForTests";
         }
 
