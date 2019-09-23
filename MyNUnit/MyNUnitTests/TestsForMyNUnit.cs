@@ -13,9 +13,6 @@ namespace MyNUnitTests
         private RunTestsInAssembly myNUnit;
         private string path;
 
-        /// <summary>
-        /// If file with given path exists, there some mistakes in order of Before/After
-        /// </summary>e="path"></param>
         private void CheckFileExistance(string path)
         {
             if (File.Exists(path))
@@ -66,7 +63,7 @@ namespace MyNUnitTests
                     }
                 }    
             }
-            Assert.AreEqual(true, isAttribute);
+            Assert.IsTrue(isAttribute);
         }
     }
 }
