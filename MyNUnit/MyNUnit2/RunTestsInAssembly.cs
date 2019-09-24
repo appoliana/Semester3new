@@ -6,15 +6,17 @@ using TestDll;
 
 namespace MyNUnit
 {
-    public class RunTestsInAssembly
+    /// <summary>
+    /// 
+    /// </summary>
+    public static class RunTestsInAssembly
     {
         /// <summary>
-        /// 
+        /// Метод, который запускает aннотации.
         /// </summary>
-        private void RunAnnotations(Assembly assembly, Type currentType)
+        private static void RunAnnotations(Assembly assembly, Type currentType)
         {
-            Object run = Activator.CreateInstance(currentType);
-            RunMethodsWithAnnotationBeforeClass(assembly, currentType, run);
+            RunMethodsWithAnnotationBeforeClass(assembly, currentType);
             foreach (MethodInfo mInfo in currentType.GetMethods())
             {
                 Attribute attribute = FindTestAttribute(mInfo);
@@ -23,11 +25,12 @@ namespace MyNUnit
                     string testName = mInfo.Name;
                     string message = "";
 
+                    Object run = Activator.CreateInstance(currentType);
                     RunMethodsWithAnnotationBefore(assembly, currentType, run);
 
                     var print = new PrintInformationAboutTests();
 
-                    TestAttribute a = (TestAttribute)attribute;
+                    var a = (TestAttribute)attribute;
                     if (a.MessageAboutIgnoreThisTest != "")
                     {
                         message = "was not done. " + a.MessageAboutIgnoreThisTest;
@@ -41,7 +44,6 @@ namespace MyNUnit
                         try
                         {
                             mInfo.Invoke(run, Array.Empty<Object>());
-                            message = "was successful.";
                             watch.Stop();
                         }
                         catch (Exception e)
@@ -54,22 +56,35 @@ namespace MyNUnit
                             }
                             else
                             {
-                                message = "was successful";
+                                if (a.Expected == null)
+                                {
+                                    message = "Error. The exception that was caught is not correct.";
+                                }
+                                else
+                                {
+                                    message = "Successfully.";
+                                }
                             }
                         }
+
+                        if (a.Expected != null)
+                        {
+                            message = $"Failed. The test hasn't thrown the {a.Expected.ToString()}";
+                        }
+
                         TimeSpan ts = watch.Elapsed;
                         print.PrintInformation(ts, message, testName);
                     }
                     RunMethodsWithAnnotationAfter(assembly, currentType, run);
                 }
-                RunMethodsWithAnnotationAfterClass(assembly, currentType, run);
+                RunMethodsWithAnnotationAfterClass(assembly, currentType);
             }
         }
 
         /// <summary>
         /// Метод, который запускает тесты в сборке.
         /// </summary>
-        public string RunTests(Assembly assembly)
+        public static string RunTests(Assembly assembly)
         {
             Type[] allTypes;
             try
@@ -81,22 +96,42 @@ namespace MyNUnit
                 return "For assembly " + assembly + "was finding error " + ex.Message;
             }
             Parallel.ForEach(allTypes, (currentType) =>
-                                        {
-                                            RunAnnotations(assembly, currentType);
-                                        });
+                    {
+                        RunAnnotations(assembly, currentType);
+                    });
+            return "0";
+        }
+
+        /// <summary>
+        /// Метод, который запускает конкретный тест по имени.
+        /// </summary>
+        public static string RunTest(Assembly assembly)
+        {
+            Type[] allTypes;
+            try
+            {
+                allTypes = assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException ex)
+            {
+                return "For assembly " + assembly + "was finding error " + ex.Message;
+            }
+            Parallel.ForEach(allTypes, (currentType) =>
+            {
+                RunAnnotations(assembly, currentType);
+            });
             return "0";
         }
 
         /// <summary>
         /// Метод, который ищет TestAttribute  у метода.
         /// </summary>
-        public Attribute FindTestAttribute(MethodInfo mInfo)
+        public static Attribute FindTestAttribute(MethodInfo mInfo)
         {
             foreach (var attribute in Attribute.GetCustomAttributes(mInfo))
             {
                 if (attribute.GetType().FullName == typeof(TestAttribute).FullName)
                 {
-                    //TestAttribute a = (TestAttribute)attribute;
                     return attribute;
                 }
             }
@@ -134,14 +169,14 @@ namespace MyNUnit
         /// <summary>
         /// Метод, который запускает методы с указанной анотацией.
         /// </summary>
-        public static void RunMethodsWithAnnotationBeforeClass(Assembly assembly, Type type, Object run)
+        public static void RunMethodsWithAnnotationBeforeClass(Assembly assembly, Type type)
         {
             var allTypes = assembly.GetTypes();
             foreach (MethodInfo mInfo in type.GetMethods())
             {
                 if (Attribute.GetCustomAttributes(mInfo).GetType() == typeof(BeforeClassAttribute))
                 {
-                    mInfo.Invoke(run, Array.Empty<Object>());
+                    mInfo.Invoke(null, Array.Empty<Object>());
                 }
             }
         }
@@ -149,14 +184,14 @@ namespace MyNUnit
         /// <summary>
         /// Метод, который запускает методы с указанной анотацией.
         /// </summary>
-        public static void RunMethodsWithAnnotationAfterClass(Assembly assembly, Type type, Object run)
+        public static void RunMethodsWithAnnotationAfterClass(Assembly assembly, Type type)
         {
             var allTypes = assembly.GetTypes();
             foreach (MethodInfo mInfo in type.GetMethods())
             {
                 if (Attribute.GetCustomAttributes(mInfo).GetType() == typeof(AfterClassAttribute))
                 {
-                    mInfo.Invoke(run, Array.Empty<Object>());
+                    mInfo.Invoke(null, Array.Empty<Object>());
                 }
             }
         }

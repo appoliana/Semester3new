@@ -9,7 +9,6 @@ namespace MyNUnitTests
     [TestClass]
     public class TestsForMyNUnit
     {
-        private RunTestsInAssembly myNUnit;
         private string path;
 
         private void CheckFileExistance(string path)
@@ -24,8 +23,6 @@ namespace MyNUnitTests
         [TestInitialize]
         public void Init()
         {
-            myNUnit = new RunTestsInAssembly();
-
             path = Assembly.GetExecutingAssembly().Location;
             path = path.Substring(0, path.IndexOf("MyNUnitTests\\bin\\Debug\\MyNUnitTests.dll")) + "ForTests";
         }
@@ -33,29 +30,26 @@ namespace MyNUnitTests
         [TestMethod]
         public void CheckTheRigthNumberOfAssemblies()
         {
-            var getter = new GetAllAssemblies();
-            var (listOfAssemblies, message) = getter.GetAll(path);
-            Assert.AreEqual(80, listOfAssemblies.Count);
+            var (listOfAssemblies, message) = AssembliesGetter.GetAll(path);
+            Assert.AreEqual(3, listOfAssemblies.Count);
         }
 
         [TestMethod]
         public void CheckRunTestOnWithAttrParams()
         {
             path = path + "\\Refleksiya\\ComparatorTests\\bin\\Debug";
-            var getter = new GetAllAssemblies();
             bool isAttribute = false;
-            var (listOfAssemblies, message) = getter.GetAll(path);
+            var (listOfAssemblies, message) = AssembliesGetter.GetAll(path);
             foreach (var i in listOfAssemblies)
             {
-                var allTypes = new Type[10000];
-                allTypes = i.GetTypes();
+                var allTypes = i.GetTypes();
                 
-
                 foreach (Type type in allTypes)
                 {
                     foreach (MethodInfo mInfo in type.GetMethods())
                     {
-                        if (myNUnit.FindTestAttribute(mInfo) != null)
+                        var myNUnit = RunTestsInAssembly.FindTestAttribute(mInfo);
+                        if (myNUnit != null)
                         {
                             isAttribute = true;
                         }
@@ -63,6 +57,14 @@ namespace MyNUnitTests
                 }    
             }
             Assert.IsTrue(isAttribute);
+        }
+
+
+        [TestMethod]
+        public void IfWeAreWaitingTheExceptionButDoNotCatchIt()
+        {
+            path = path + "\\Refleksiya\\ComparatorTests\\bin\\Debug";
+
         }
     }
 }

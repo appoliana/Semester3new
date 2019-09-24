@@ -53,5 +53,12 @@ namespace CompClass
                 Assert.IsTrue(listTestFields.Contains(f));
             }
         }
+
+        /// <summary>
+        /// Должен быть failed
+        /// </summary>
+        [Test(Excepted = typeof(Exception))]
+        [TestMethod]
+        public void Test() {}
     }
 }

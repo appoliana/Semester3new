@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MyNUnit
@@ -11,16 +9,12 @@ namespace MyNUnit
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Write a parth to assembly...");
-            string parth = Console.ReadLine();
-            string messageAboutWorkingAssemblies = "";
-            var listOfAssemblies = new List<Assembly>();
-            var getter = new GetAllAssemblies();
-            (listOfAssemblies, messageAboutWorkingAssemblies) = getter.GetAll(parth);
+            Console.WriteLine("Write a path to assembly...");
+            string path = Console.ReadLine();
+            var (listOfAssemblies, messageAboutWorkingAssemblies) = AssembliesGetter.GetAll(path);
             if (messageAboutWorkingAssemblies == "Все в порядке, ошибок нет!")
             {
                 Console.WriteLine("Assemblies are ready, tests begining to work.");
-
                 Parallel.ForEach(listOfAssemblies, RunAssemblies);
             }
             else
@@ -36,8 +30,7 @@ namespace MyNUnit
         /// </summary>
         public static void RunAssemblies(Assembly assembly)
         {
-            var run = new RunTestsInAssembly();
-            run.RunTests(assembly);
+            var run = RunTestsInAssembly.RunTests(assembly);
         }
     }
 }
