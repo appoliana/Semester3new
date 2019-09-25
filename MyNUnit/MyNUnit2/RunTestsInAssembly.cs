@@ -14,7 +14,7 @@ namespace MyNUnit
         /// <summary>
         /// Метод, который запускает aннотации.
         /// </summary>
-        private static void RunAnnotations(Assembly assembly, Type currentType)
+        private static void RunAnnotationsForAllTests(Assembly assembly, Type currentType)
         {
             RunMethodsWithAnnotationBeforeClass(assembly, currentType);
             foreach (MethodInfo mInfo in currentType.GetMethods())
@@ -82,6 +82,80 @@ namespace MyNUnit
         }
 
         /// <summary>
+        /// Метод, который запускает aннотации для конкретного теста.
+        /// </summary>
+        private static (TimeSpan, string, string) RunAnnotationsForOneTest(Assembly assembly, Type currentType, string testNameWeNeed)
+        {
+            var flag = false;
+            string message = "";
+            RunMethodsWithAnnotationBeforeClass(assembly, currentType);
+            foreach (MethodInfo mInfo in currentType.GetMethods())
+            {
+                string testName = mInfo.Name;
+                if (testName == testNameWeNeed)
+                {
+                    flag = true;
+                    Attribute attribute = FindTestAttribute(mInfo);
+                    if (attribute != null)
+                    {
+                        Object run = Activator.CreateInstance(currentType);
+                        RunMethodsWithAnnotationBefore(assembly, currentType, run);
+
+                        var a = (TestAttribute)attribute;
+                        if (a.MessageAboutIgnoreThisTest != "")
+                        {
+                            message = "was not done. " + a.MessageAboutIgnoreThisTest;
+                            return(default(TimeSpan), message, testName);
+                        }
+
+                        if (message == "")
+                        {
+                            var watch = new Stopwatch();
+                            watch.Start();
+                            try
+                            {
+                                mInfo.Invoke(run, Array.Empty<Object>());
+                                watch.Stop();
+                            }
+                            catch (Exception e)
+                            {
+                                watch.Stop();
+                                var exceptionType = e.InnerException;
+                                if (exceptionType != a.Expected)
+                                {
+                                    message = $"thrown the {exceptionType.ToString()}. Exception message is: {e.Message}";
+                                }
+                                else
+                                {
+                                    if (a.Expected == null)
+                                    {
+                                        message = "Error. The exception that was caught is not correct.";
+                                    }
+                                    else
+                                    {
+                                        message = "Successfully.";
+                                    }
+                                }
+                            }
+
+                            if (a.Expected != null)
+                            {
+                                message = $"Failed. The test hasn't thrown the {a.Expected.ToString()}";
+                            }
+
+                            TimeSpan ts = watch.Elapsed;
+                            return(ts, message, testName);
+                        }
+                        RunMethodsWithAnnotationAfter(assembly, currentType, run);
+                    }
+                }
+                RunMethodsWithAnnotationAfterClass(assembly, currentType);
+            }
+            message = "Failed.";
+            return(default(TimeSpan), message, testNameWeNeed);
+        }
+
+        /// <summary>
         /// Метод, который запускает тесты в сборке.
         /// </summary>
         public static string RunTests(Assembly assembly)
@@ -97,15 +171,15 @@ namespace MyNUnit
             }
             Parallel.ForEach(allTypes, (currentType) =>
                     {
-                        RunAnnotations(assembly, currentType);
+                        RunAnnotationsForAllTests(assembly, currentType);
                     });
             return "0";
         }
 
         /// <summary>
-        /// Метод, который запускает конкретный тест по имени.
+        /// Метод, который запускает конкретный тест в сборке.
         /// </summary>
-        public static string RunTest(Assembly assembly)
+        public static (TimeSpan, string, string) RunOneTest(Assembly assembly, string testNameWeNeed)
         {
             Type[] allTypes;
             try
@@ -114,13 +188,29 @@ namespace MyNUnit
             }
             catch (ReflectionTypeLoadException ex)
             {
-                return "For assembly " + assembly + "was finding error " + ex.Message;
+                return (default(TimeSpan), "Возникли проблемы со сборкой: ", ex.Message);
             }
+            var flag = false;
+            var timeForReturn = default(TimeSpan);
+            var messageForReturn = "";
             Parallel.ForEach(allTypes, (currentType) =>
             {
-                RunAnnotations(assembly, currentType);
+                var (time, message, testName) = RunAnnotationsForOneTest(assembly, currentType, testNameWeNeed);
+                if (message != "Failed.")
+                {
+                    flag = true;
+                    messageForReturn = message;
+                    timeForReturn = time;
+                }
             });
-            return "0";
+            if (!flag)
+            { 
+                return (default(TimeSpan), "Failed.", testNameWeNeed);
+            }
+            else
+            {
+                return (timeForReturn, messageForReturn, testNameWeNeed);
+            }
         }
 
         /// <summary>

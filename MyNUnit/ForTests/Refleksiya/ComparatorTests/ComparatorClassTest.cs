@@ -59,6 +59,6 @@ namespace CompClass
         /// </summary>
         [Test(Excepted = typeof(Exception))]
         [TestMethod]
-        public void Test() {}
+        public void TestForEmpty() {}
     }
 }

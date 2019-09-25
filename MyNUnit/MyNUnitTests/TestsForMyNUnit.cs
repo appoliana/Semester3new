@@ -64,7 +64,12 @@ namespace MyNUnitTests
         public void IfWeAreWaitingTheExceptionButDoNotCatchIt()
         {
             path = path + "\\Refleksiya\\ComparatorTests\\bin\\Debug";
-
+            var (listOfAssemblies, message) = AssembliesGetter.GetAll(path);
+            foreach (var i in listOfAssemblies)
+            {
+                var (time, messageAboutTest, testName) = RunTestsInAssembly.RunOneTest(i, "TestForEmpty");
+                Assert.AreEqual("Failed.", messageAboutTest);
+            }
         }
     }
 }
