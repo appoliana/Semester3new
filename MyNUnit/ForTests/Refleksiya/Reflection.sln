@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.421
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reflection", "Refleksiya\Reflection.csproj", "{E357749A-111E-4C6E-B9CF-95C4BA890AEA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComparatorTests", "ComparatorTests\ComparatorTests.csproj", "{E2714B35-CD36-449F-8466-9B29F694D40F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E357749A-111E-4C6E-B9CF-95C4BA890AEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E357749A-111E-4C6E-B9CF-95C4BA890AEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E357749A-111E-4C6E-B9CF-95C4BA890AEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E357749A-111E-4C6E-B9CF-95C4BA890AEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2714B35-CD36-449F-8466-9B29F694D40F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2714B35-CD36-449F-8466-9B29F694D40F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2714B35-CD36-449F-8466-9B29F694D40F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2714B35-CD36-449F-8466-9B29F694D40F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4FE0BB5B-C0CD-4183-BB4E-5DC00AD6B504}
+	EndGlobalSection
+EndGlobal
